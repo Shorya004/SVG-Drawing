@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SVG Drawing Box</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      font-family: Arial, sans-serif;
+    }
+
+    svg {
+      border: 2px solid #333;
+      background: #f9f9f9;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+
+<svg id="drawingArea" width="600" height="400"></svg>
+
+<script>
+  const svg = document.getElementById("drawingArea");
+
+  let isDrawing = false;
+  let currentPolyline = null;
+
+  svg.addEventListener("mousedown", (e) => {
+    isDrawing = true;
+
+    const { x, y } = getMousePosition(e);
+
+    currentPolyline = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polyline"
+    );
+
+    currentPolyline.setAttribute("points", `${x},${y}`);
+    currentPolyline.setAttribute("fill", "none");
+    currentPolyline.setAttribute("stroke", "black");
+    currentPolyline.setAttribute("stroke-width", "2");
+
+    svg.appendChild(currentPolyline);
+  });
+
+  svg.addEventListener("mousemove", (e) => {
+    if (!isDrawing) return;
+
+    const { x, y } = getMousePosition(e);
+    const points = currentPolyline.getAttribute("points");
+    currentPolyline.setAttribute("points", `${points} ${x},${y}`);
+  });
+
+  svg.addEventListener("mouseup", () => {
+    isDrawing = false;
+    currentPolyline = null;
+  });
+
+  svg.addEventListener("mouseleave", () => {
+    isDrawing = false;
+    currentPolyline = null;
+  });
+
+  function getMousePosition(event) {
+    const rect = svg.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+</script>
+
+</body>
+</html>
